@@ -1,0 +1,15 @@
+{% extends 'kviz/full.html' %}
+{% load static %}
+{% block content %}
+
+{% if error %}
+   <h1>{{ error }}</h1>
+{% else %}
+    <h1>Ti si {{ result }} Dragan</h1>
+    <img src="{% static 'kviz/'|add:result|add:'.jpeg'' %}" alt="dragan">
+{% endif %}
+
+<a href="{% url 'kviz:kviz'%}"> Vrati se na kviz </a>
+
+
+{% endblock %}
