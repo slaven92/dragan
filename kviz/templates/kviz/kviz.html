@@ -4,11 +4,14 @@
 {% block content %}
 
 
+<div class="container">
+
+    <div class="progress">
+    <div class="progress-bar" role="progressbar" style="{{ 'width: '|add:percent|add:'%;' }}" >{{ question_number }}/{{ total_number }}</div>
+    </div>
 
 {% if question %}
-   <h1>{{ question.question_text }}({{ question_number }}/{{ total_number }})</h1>
-
-   {% if error %}<p><strong>{{ error }}</strong></p>{% endif %}
+   <h1>{{ question.question_text }}</h1>
 
     {% if question_number < total_number %}
         <form action="{% url 'kviz:kviz'%}" method="post">
@@ -17,22 +20,26 @@
     {% endif %}
 
     {% csrf_token %}
-    {% for choice in question.choice_set.all %}
-        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-    {% endfor %}
+
+    <div class="form-check form-group">
+        {% for choice in question.choice_set.all %}
+            <input class="form-check-input" type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+            <label class="form-check-label" for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+        {% endfor %}
+    </div>
 
     {% if question_number < total_number %}
-        <input type="submit" value="Dalje">
+        <input class="btn btn-primary" type="submit" value="Dalje">
     {% else %}
-        <input type="submit" value="Rezultat">
+        <input class="btn btn-primary" type="submit" value="Rezultat">
     {% endif %}
 
     </form>
-
+    {% if error %}<p><strong>{{ error }}</strong></p>{% endif %}
 {% else %}
     <p>Nema pitanja.</p>
 {% endif %}
 
+</div>
 
 {% endblock %}

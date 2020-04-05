@@ -26,20 +26,24 @@ def kviz(request):
         question_number = request.session.get('question_number', 1)
         question_list = get_list_or_404(Question)
         question = get_object_or_404(Question, pk=question_number)
+        percent = (100*question_number)//len(question_list)
         context = { 'question':question,
                     'question_number':question_number,
                     'total_number':len(question_list),
-                    'error': 'Nema preskakanja'}
+                    'error': 'Nema preskakanja',
+                    'percent':str(percent),}
         return render(request, 'kviz/kviz.html', context)
     else:
         print(request.session['result'])
         question_number = request.session.get('question_number', 1)
         question_list = get_list_or_404(Question)
         question = get_object_or_404(Question, pk=question_number)
+        percent = (100*question_number)//len(question_list)
         context = { 'question':question,
                     'question_number':question_number,
                     'total_number':len(question_list),
-                    'error':''}
+                    'error':'',
+                    'percent': str(percent),}
         return render(request, 'kviz/kviz.html', context)
 
 def result(request):

@@ -5,11 +5,14 @@
 {% if error %}
    <h1>{{ error }}</h1>
 {% else %}
-    <h1>Ti si {{ result }} Dragan.ovo je Milicin text</h1>
-    <img src="{% static 'kviz/'|add:result|add:'.jpeg'' %}" alt="dragan">
-{% endif %}
+    <div class="container">
+        <h1>Ti si {{ result }} Dragan</h1>
+        <img src="{% static 'kviz/'|add:result|add:'.jpeg' %}" alt="dragan" class="img-fluid img-thumbnail rounded">
+    </div>    
+    {% endif %}
 
-<a href="{% url 'kviz:kviz'%}"> Vrati se na kviz </a>
-
+    <div class="container">
+        <a class="btn btn-primary" href="{% url 'kviz:kviz'%}"> Vrati se na kviz </a>
+    </div>
 
 {% endblock %}
