@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '9vtqrbo!*!#0)ljlt&m)vg^#6wb3n-4r&(6lg5a*tu!3)#2u8u'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['slaven92.ddns.net', '192.168.0.14', '127.0.0.1']
 
