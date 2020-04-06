@@ -8,7 +8,6 @@
 {% if question %}
    <h1>{{ question.question_text }}({{ question_number }}/{{ total_number }})</h1>
 
-   {% if error %}<p><strong>{{ error }}</strong></p>{% endif %}
 
     {% if question_number < total_number %}
         <form action="{% url 'kviz:kviz'%}" method="post">
@@ -23,12 +22,14 @@
     {% endfor %}
 
     {% if question_number < total_number %}
-        <input type="submit" value="Dalje">
+        <input class="btn btn-primary" type="submit" value="Dalje">
     {% else %}
-        <input type="submit" value="Rezultat">
+        <input class="btn btn-primary" type="submit" value="Rezultat">
     {% endif %}
 
     </form>
+
+    {% if error %}<p class="alert alert-danger" role="alert"><strong>{{ error }}</strong></p>{% endif %}
 
 {% else %}
     <p>Nema pitanja.</p>
