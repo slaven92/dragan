@@ -15,4 +15,13 @@
         <a class="btn btn-primary" href="{% url 'kviz:kviz'%}"> Vrati se na kviz </a>
     </div>
 
+    
+    <div class="container">
+    <ul>
+        {% for answer in user_results %}
+            <li>{{ forloop.counter }}. {{ answer }}</li>
+        {% endfor %}
+    </ul>
+    </div>
+
 {% endblock %}

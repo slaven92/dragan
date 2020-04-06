@@ -8,7 +8,7 @@ DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
 
 # Create your views here.
-from .models import Question
+from .models import Question, Choice
 
 
 def index(request):
@@ -20,7 +20,8 @@ def kviz(request):
             request.session['question_number'] = 1
             request.session['result'] = []
         elif(request.method == 'POST'):
-            request.session['result'].append(request.POST['choice'])
+            ch = get_object_or_404(Choice, pk=request.POST['choice'])
+            request.session['result'].append(ch.choice_text)
             request.session['question_number'] += 1
     except (KeyError):
         context = create_contex_for_kviz(request, 'Nema preskakanja!')
@@ -53,8 +54,8 @@ def result(request):
 
             #===========
     context = { 'result': result,
-                'error' : error}
-    print(request.session['result'])
+                'error' : error,
+                'user_results': request.session['result']}
     return render(request, 'kviz/result.html', context)
 
 def create_contex_for_kviz(request, error):
