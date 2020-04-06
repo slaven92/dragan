@@ -23,27 +23,10 @@ def kviz(request):
             request.session['result'].append(request.POST['choice'])
             request.session['question_number'] += 1
     except (KeyError):
-        question_number = request.session.get('question_number', 1)
-        question_list = get_list_or_404(Question)
-        question = get_object_or_404(Question, pk=question_number)
-        percent = (100*question_number)//len(question_list)
-        context = { 'question':question,
-                    'question_number':question_number,
-                    'total_number':len(question_list),
-                    'error': 'Nema preskakanja',
-                    'percent':str(percent),}
+        context = create_contex_for_kviz(request, 'Nema preskakanja!')
         return render(request, 'kviz/kviz.html', context)
     else:
-        print(request.session['result'])
-        question_number = request.session.get('question_number', 1)
-        question_list = get_list_or_404(Question)
-        question = get_object_or_404(Question, pk=question_number)
-        percent = (100*question_number)//len(question_list)
-        context = { 'question':question,
-                    'question_number':question_number,
-                    'total_number':len(question_list),
-                    'error':'',
-                    'percent': str(percent),}
+        context = create_contex_for_kviz(request,"")
         return render(request, 'kviz/kviz.html', context)
 
 def result(request):
@@ -51,19 +34,37 @@ def result(request):
         error = 'odradi kviz prvo'
         result = ''
     elif(request.method == 'POST'):
-        error = ''
-        request.session['result'].append(request.POST['choice'])
-        
-        # logic here
-        images = IM_DIR+'*.jpeg'
-        image_list = glob.glob(images)
-        image_list_base = [ os.path.basename(p) for p in image_list ]
-        image_list_names = [ os.path.splitext(p)[0] for p in image_list_base ]
-        #======================
-        result = random.choice(image_list_names)
+        try:
+            request.session['result'].append(request.POST['choice'])
+        except (KeyError):
+            context = create_contex_for_kviz(request, 'Nema preskakanja!')
+            return render(request, 'kviz/kviz.html', context)
+        else:
+            error = ''
 
-        #===========
+            
+            # logic here
+            images = IM_DIR+'*.jpeg'
+            image_list = glob.glob(images)
+            image_list_base = [ os.path.basename(p) for p in image_list ]
+            image_list_names = [ os.path.splitext(p)[0] for p in image_list_base ]
+            #======================
+            result = random.choice(image_list_names)
+
+            #===========
     context = { 'result': result,
                 'error' : error}
     print(request.session['result'])
     return render(request, 'kviz/result.html', context)
+
+def create_contex_for_kviz(request, error):
+    question_number = request.session.get('question_number', 1)
+    question_list = get_list_or_404(Question)
+    question = get_object_or_404(Question, pk=question_number)
+    percent = (100*question_number)//len(question_list)
+    context = { 'question':question,
+                'question_number':question_number,
+                'total_number':len(question_list),
+                'error': error,
+                'percent':str(percent),}
+    return context
