@@ -3,6 +3,7 @@ from django.http import HttpResponse
 import glob
 import os
 import random
+from django.views.generic import View
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
@@ -10,21 +11,14 @@ IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
 # Create your views here.
 from .models import Question, Choice
 
+class IndexView(View):
+    def get(self, request, *args, **kwargs):
+        request.session['question_number'] = 1
+        request.session['result'] = []
+        return render(request, 'kviz/index.html', {})
 
-def index(request):
-    request.session['question_number'] = 1
-    request.session['result'] = []
-    return render(request, 'kviz/index.html', {})
-
-def kviz(request):
-    if(request.method == 'GET'):
-        context = create_contex_for_kviz(request,"")
-        return render(request, 'kviz/kviz.html', context)
-    else:
-        return redirect('kviz:kviz')
-
-def result(request):
-    if(request.method == 'GET'):
+class ResultView(View):
+    def get(self, request, *args, **kwargs):
         num_of_questions = len(get_list_or_404(Question))
         if request.session['question_number'] == num_of_questions:
             # logic here
@@ -46,14 +40,15 @@ def result(request):
                         'error' : 'Prvo odradi kviz',
                         'user_results': []}
             return render(request, 'kviz/result.html', context)
-    else:
+    
+    def post(self, request, *args, **kwargs):
         return redirect('kviz:kviz')
 
-
-def process(request):
-    if(request.method == 'GET'):
+class ProcessView(View):
+    def get(self, request, *args, **kwargs):
         return redirect('kviz:kviz')
-    elif(request.method == 'POST'):
+    
+    def post(self, request, *args, **kwargs):
         try:
             ch = get_object_or_404(Choice, pk=request.POST['choice'])
         except (KeyError):
@@ -66,7 +61,17 @@ def process(request):
                 request.session.modified = True
                 return redirect('kviz:result')
             request.session['question_number'] += 1
-    return redirect('kviz:kviz')
+        return redirect('kviz:kviz')
+
+class KvizView(View):
+    template_name = "kviz/kviz.html"
+
+    def get(self, request, *args, **kwargs):
+        context = create_contex_for_kviz(request,"")
+        return render(request, 'kviz/kviz.html', context)
+
+    def post(self, request, *args, **kwargs):
+        return redirect('kviz:kviz')
 
 
 ## helper functions
