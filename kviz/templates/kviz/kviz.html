@@ -13,12 +13,7 @@
 {% if question %}
    <h1>{{ question.question_text }}</h1>
 
-    {% if question_number < total_number %}
-        <form action="{% url 'kviz:kviz'%}" method="post">
-    {% else %}
-        <form action="{% url 'kviz:result'%}" method="post">
-    {% endif %}
-
+    <form action="{% url 'kviz:process'%}" method="post">
     {% csrf_token %}
 
     <div class="form-check form-group">

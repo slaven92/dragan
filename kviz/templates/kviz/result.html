@@ -3,13 +3,15 @@
 {% block content %}
 
 {% if error %}
-   <h1>{{ error }}</h1>
+    <div class="container">
+        <h1>{{ error }}</h1>
+        <a class="btn btn-primary" href="{% url 'kviz:kviz'%}"> Vrati se na kviz </a>
+    </div>   
 {% else %}
     <div class="container">
         <h1>Ti si {{ result }} Dragan</h1>
         <img src="{% static 'kviz/'|add:result|add:'.jpeg' %}" alt="dragan" class="img-fluid img-thumbnail rounded">
     </div>    
-    {% endif %}
 
     <div class="container">
         <a class="btn btn-primary" href="{% url 'kviz:kviz'%}"> Vrati se na kviz </a>
@@ -23,5 +25,6 @@
         {% endfor %}
     </ul>
     </div>
+{% endif %}
 
 {% endblock %}

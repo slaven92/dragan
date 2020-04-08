@@ -7,4 +7,5 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('kviz/', views.kviz, name='kviz'),
     path('result/', views.result, name='result'),
+    path('process/', views.process, name='process'),
 ]
