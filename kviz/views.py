@@ -4,6 +4,7 @@ import glob
 import os
 import random
 from django.views.generic import View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
@@ -49,19 +50,22 @@ class ProcessView(View):
         return redirect('kviz:kviz')
     
     def post(self, request, *args, **kwargs):
-        try:
-            ch = get_object_or_404(Choice, pk=request.POST['choice'])
-        except (KeyError):
-            context = create_contex_for_kviz(request, 'Nema preskakanja!')
-            return render(request, 'kviz/kviz.html', context)
+        if not request.user.is_authenticated and request.session['question_number']>1:
+            return redirect('/accounts/login/?next=%s' % (request.path))
         else:
-            num_of_questions = len(get_list_or_404(Question))
-            request.session['result'].append(ch.choice_text)
-            if request.session['question_number'] == num_of_questions:
-                request.session.modified = True
-                return redirect('kviz:result')
-            request.session['question_number'] += 1
-        return redirect('kviz:kviz')
+            try:
+                ch = get_object_or_404(Choice, pk=request.POST['choice'])
+            except (KeyError):
+                context = create_contex_for_kviz(request, 'Nema preskakanja!')
+                return render(request, 'kviz/kviz.html', context)
+            else:
+                num_of_questions = len(get_list_or_404(Question))
+                request.session['result'].append(ch.choice_text)
+                if request.session['question_number'] == num_of_questions:
+                    request.session.modified = True
+                    return redirect('kviz:result')
+                request.session['question_number'] += 1
+            return redirect('kviz:kviz')
 
 class KvizView(View):
     template_name = "kviz/kviz.html"
