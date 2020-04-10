@@ -5,6 +5,8 @@ import os
 import random
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
@@ -76,6 +78,25 @@ class KvizView(View):
 
     def post(self, request, *args, **kwargs):
         return redirect('kviz:kviz')
+
+class SignupView(View):
+    template_name = 'kviz/signup.html'
+
+    def get(self, request, *args, **kwargs):
+        form = UserCreationForm()
+        return render(request, 'registration/signup.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('kviz:kviz')
+        return render(request, 'registration/signup.html', {'form': form})
+
 
 
 ## helper functions
