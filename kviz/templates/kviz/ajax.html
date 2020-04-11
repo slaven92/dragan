@@ -1,0 +1,29 @@
+{% extends 'kviz/full.html' %}
+
+
+{% block content %}
+<h1 id='question'>Zelis da saznas koji si Dragan</h1>
+<div id='answerContainer'>
+    <button class="answer btn btn-primary"  type="button">Pocni kviz</button>
+</div>
+
+<div id='imageContainer'>
+</div>
+
+{% endblock %}
+
+
+{% block javascript %}
+
+<script>
+    {% load static %}
+    var url = {% url 'kviz:ajax' %}
+    var home = {% url 'kviz:kviz2'%}
+    function get_name(name){
+        var firstPart = "{% static 'kviz/' %}"
+        return firstPart + name + '.jpeg'
+        return "{% static 'kviz/'|add:'name'|add:'.jpeg' %}"
+    }
+</script>
+
+{% endblock %}

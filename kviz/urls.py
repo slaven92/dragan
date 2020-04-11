@@ -9,5 +9,6 @@ urlpatterns = [
     path('result/', views.ResultView.as_view(), name='result'),
     path('process/', views.ProcessView.as_view(), name='process'),
     path('signup/', views.SignupView.as_view(), name = 'signup'),
-    path('ajax/<str:answer>', views.AjaxView.as_view(), name='ajax'),
+    path('ajax/', views.AjaxView.as_view(), name='ajax'),
+    path('kviz2/', views.Kviz2View.as_view(), name='kviz2',)
 ]

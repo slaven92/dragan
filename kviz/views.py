@@ -100,8 +100,8 @@ class SignupView(View):
 
 class AjaxView(View):
     # TODO change to post, change URL, you will get answer from request.post
-    def get(self, request, answer, *args, **kwargs):
-        if request.is_ajax():
+    def get(self, request, *args, **kwargs):
+        if request.is_ajax(): #request.is_ajax()
             if not 'question_number' in request.session:
                 request.session['question_number'] = 1
                 request.session['result'] = []
@@ -112,7 +112,7 @@ class AjaxView(View):
                 return JsonResponse(context, status = 200)
             
 
-            if not is_answer_valid(request, answer):
+            if not is_answer_valid(request):
                 context = {}
                 context['error'] = 'please submit correct answer'
                 return JsonResponse(context, status = 200)
@@ -127,13 +127,16 @@ class AjaxView(View):
 
             #skip first question
             if request.session['question_number'] != 1:
-                request.session['result'].append(answer)
+                request.session['result'].append(request.GET['answer'])
             context = create_context_for_ajax(request)
             request.session['question_number'] += 1
             return JsonResponse(context, status = 200)
         else:
             return redirect('kviz:kviz')
 
+class Kviz2View(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'kviz/ajax.html', {})
 
 
 ## helper functions
@@ -165,7 +168,6 @@ def create_context_for_ajax(request):
     context['total_number'] = len(get_list_or_404(Question))
     context['current_number'] = question_number
     context['authorized'] = True
-    context['error'] = ""
     return context
 
 def calculate_result(request, context):
@@ -180,7 +182,7 @@ def calculate_result(request, context):
     context['result'] = result
     return context
 
-def is_answer_valid(request, answer):
+def is_answer_valid(request):
     if request.session['question_number'] == 1:
         return True
     
@@ -188,8 +190,11 @@ def is_answer_valid(request, answer):
     question = get_object_or_404(Question, pk=question_number)
     choices = question.choice_set.all()
     choices = [choice.choice_text for choice in choices]
-    #TODO check key of post method as well
-    if answer in choices:
+    
+    if 'answer' not in request.GET:
+        return False
+
+    if request.GET['answer'] in choices:
         return True
 
     return False
