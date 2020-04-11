@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_list_or_404, get_object_or_404, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.core import serializers
 import glob
 import os
 import random
@@ -97,11 +98,50 @@ class SignupView(View):
             return redirect('kviz:kviz')
         return render(request, 'registration/signup.html', {'form': form})
 
+class AjaxView(View):
+    # TODO change to post, change URL, you will get answer from request.post
+    def get(self, request, answer, *args, **kwargs):
+        if request.is_ajax():
+            if not 'question_number' in request.session:
+                request.session['question_number'] = 1
+                request.session['result'] = []
+            #no authentication
+            if not request.user.is_authenticated and request.session['question_number']>1:
+                context = {}
+                context['authorized'] = False
+                return JsonResponse(context, status = 200)
+            
+
+            if not is_answer_valid(request, answer):
+                context = {}
+                context['error'] = 'please submit correct answer'
+                return JsonResponse(context, status = 200)
+
+            
+            if request.session['question_number'] == get_total_number()+1:
+                context = {}
+                context = calculate_result(request, context)
+                request.session['question_number'] = 1
+                request.session['result'] = []
+                return JsonResponse(context, status = 200)
+
+            #skip first question
+            if request.session['question_number'] != 1:
+                request.session['result'].append(answer)
+            context = create_context_for_ajax(request)
+            request.session['question_number'] += 1
+            return JsonResponse(context, status = 200)
+        else:
+            return redirect('kviz:kviz')
+
 
 
 ## helper functions
 def create_contex_for_kviz(request, error):
-    question_number = request.session.get('question_number', 1)
+    if not 'question_number' in request.session:
+        request.session['question_number'] = 1
+        request.session['result'] = []
+    question_number = request.session['question_number']
     question_list = get_list_or_404(Question)
     question = get_object_or_404(Question, pk=question_number)
     percent = (100*question_number)//len(question_list)
@@ -112,3 +152,47 @@ def create_contex_for_kviz(request, error):
                 'percent':str(percent),}
     return context
 
+def create_context_for_ajax(request):
+    context = {}
+    if not 'question_number' in request.session:
+        request.session['question_number'] = 1
+        request.session['result'] = []
+    question_number = request.session['question_number']
+    question = get_object_or_404(Question, pk=question_number)
+    context['question'] = question.question_text
+    choices = question.choice_set.all()
+    context['answer'] = [choice.choice_text for choice in choices]
+    context['total_number'] = len(get_list_or_404(Question))
+    context['current_number'] = question_number
+    context['authorized'] = True
+    context['error'] = ""
+    return context
+
+def calculate_result(request, context):
+    request.session.modified = True
+    print(request.session['result'])
+    images = IM_DIR+'*.jpeg'
+    image_list = glob.glob(images)
+    image_list_base = [ os.path.basename(p) for p in image_list ]
+    image_list_names = [ os.path.splitext(p)[0] for p in image_list_base ]
+    #======================
+    result = random.choice(image_list_names)
+    context['result'] = result
+    return context
+
+def is_answer_valid(request, answer):
+    if request.session['question_number'] == 1:
+        return True
+    
+    question_number = request.session['question_number'] - 1
+    question = get_object_or_404(Question, pk=question_number)
+    choices = question.choice_set.all()
+    choices = [choice.choice_text for choice in choices]
+    #TODO check key of post method as well
+    if answer in choices:
+        return True
+
+    return False
+
+def get_total_number():
+    return len(get_list_or_404(Question))
