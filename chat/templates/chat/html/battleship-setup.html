@@ -1,0 +1,196 @@
+<html>
+    <head>
+        <title>Setup</title>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'chat/css/battleship-style.css' %}">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="{% static 'chat/js/battleship-script.js' %}"></script>
+    </head>
+    <body onload="funkcijaSetup()">
+        <div id="setup">
+            <div class="naslovSetup text-primary" >
+                <h1 id="igrac1Naslov">Igrac 1</h1>
+            </div>
+            <div>
+                <table border="1px" align="center" class="tablaSetup">
+                    <tr>
+                        <td></td>
+                        <td>A</td>
+                        <td>B</td>
+                        <td>C</td>
+                        <td>D</td>
+                        <td>E</td>
+                        <td>F</td>
+                        <td>G</td>
+                        <td>H</td>
+                        <td>I</td>
+                        <td>J</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td onmousedown="fjaMouseDown(0,0)" onmouseup="fjaMouseUp(0,0)" id="0,0"></td>
+                        <td onmousedown="fjaMouseDown(1,0)" onmouseup="fjaMouseUp(1,0)" id="1,0"></td>
+                        <td onmousedown="fjaMouseDown(2,0)" onmouseup="fjaMouseUp(2,0)" id="2,0"></td>
+                        <td onmousedown="fjaMouseDown(3,0)" onmouseup="fjaMouseUp(3,0)" id="3,0"></td>
+                        <td onmousedown="fjaMouseDown(4,0)" onmouseup="fjaMouseUp(4,0)" id="4,0"></td>
+                        <td onmousedown="fjaMouseDown(5,0)" onmouseup="fjaMouseUp(5,0)" id="5,0"></td>
+                        <td onmousedown="fjaMouseDown(6,0)" onmouseup="fjaMouseUp(6,0)" id="6,0"></td>
+                        <td onmousedown="fjaMouseDown(7,0)" onmouseup="fjaMouseUp(7,0)" id="7,0"></td>
+                        <td onmousedown="fjaMouseDown(8,0)" onmouseup="fjaMouseUp(8,0)" id="8,0"></td>
+                        <td onmousedown="fjaMouseDown(9,0)" onmouseup="fjaMouseUp(9,0)" id="9,0"></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td onmousedown="fjaMouseDown(0,1)" onmouseup="fjaMouseUp(0,1)" id="0,1"></td>
+                        <td onmousedown="fjaMouseDown(1,1)" onmouseup="fjaMouseUp(1,1)" id="1,1"></td>
+                        <td onmousedown="fjaMouseDown(2,1)" onmouseup="fjaMouseUp(2,1)" id="2,1"></td>
+                        <td onmousedown="fjaMouseDown(3,1)" onmouseup="fjaMouseUp(3,1)" id="3,1"></td>
+                        <td onmousedown="fjaMouseDown(4,1)" onmouseup="fjaMouseUp(4,1)" id="4,1"></td>
+                        <td onmousedown="fjaMouseDown(5,1)" onmouseup="fjaMouseUp(5,1)" id="5,1"></td>
+                        <td onmousedown="fjaMouseDown(6,1)" onmouseup="fjaMouseUp(6,1)" id="6,1"></td>
+                        <td onmousedown="fjaMouseDown(7,1)" onmouseup="fjaMouseUp(7,1)" id="7,1"></td>
+                        <td onmousedown="fjaMouseDown(8,1)" onmouseup="fjaMouseUp(8,1)" id="8,1"></td>
+                        <td onmousedown="fjaMouseDown(9,1)" onmouseup="fjaMouseUp(9,1)" id="9,1"></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td onmousedown="fjaMouseDown(0,2)" onmouseup="fjaMouseUp(0,2)" id="0,2"></td>
+                        <td onmousedown="fjaMouseDown(1,2)" onmouseup="fjaMouseUp(1,2)" id="1,2"></td>
+                        <td onmousedown="fjaMouseDown(2,2)" onmouseup="fjaMouseUp(2,2)" id="2,2"></td>
+                        <td onmousedown="fjaMouseDown(3,2)" onmouseup="fjaMouseUp(3,2)" id="3,2"></td>
+                        <td onmousedown="fjaMouseDown(4,2)" onmouseup="fjaMouseUp(4,2)" id="4,2"></td>
+                        <td onmousedown="fjaMouseDown(5,2)" onmouseup="fjaMouseUp(5,2)" id="5,2"></td>
+                        <td onmousedown="fjaMouseDown(6,2)" onmouseup="fjaMouseUp(6,2)" id="6,2"></td>
+                        <td onmousedown="fjaMouseDown(7,2)" onmouseup="fjaMouseUp(7,2)" id="7,2"></td>
+                        <td onmousedown="fjaMouseDown(8,2)" onmouseup="fjaMouseUp(8,2)" id="8,2"></td>
+                        <td onmousedown="fjaMouseDown(9,2)" onmouseup="fjaMouseUp(9,2)" id="9,2"></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td onmousedown="fjaMouseDown(0,3)" onmouseup="fjaMouseUp(0,3)" id="0,3"></td>
+                        <td onmousedown="fjaMouseDown(1,3)" onmouseup="fjaMouseUp(1,3)" id="1,3"></td>
+                        <td onmousedown="fjaMouseDown(2,3)" onmouseup="fjaMouseUp(2,3)" id="2,3"></td>
+                        <td onmousedown="fjaMouseDown(3,3)" onmouseup="fjaMouseUp(3,3)" id="3,3"></td>
+                        <td onmousedown="fjaMouseDown(4,3)" onmouseup="fjaMouseUp(4,3)" id="4,3"></td>
+                        <td onmousedown="fjaMouseDown(5,3)" onmouseup="fjaMouseUp(5,3)" id="5,3"></td>
+                        <td onmousedown="fjaMouseDown(6,3)" onmouseup="fjaMouseUp(6,3)" id="6,3"></td>
+                        <td onmousedown="fjaMouseDown(7,3)" onmouseup="fjaMouseUp(7,3)" id="7,3"></td>
+                        <td onmousedown="fjaMouseDown(8,3)" onmouseup="fjaMouseUp(8,3)" id="8,3"></td>
+                        <td onmousedown="fjaMouseDown(9,3)" onmouseup="fjaMouseUp(9,3)" id="9,3"></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td onmousedown="fjaMouseDown(0,4)" onmouseup="fjaMouseUp(0,4)" id="0,4"></td>
+                        <td onmousedown="fjaMouseDown(1,4)" onmouseup="fjaMouseUp(1,4)" id="1,4"></td>
+                        <td onmousedown="fjaMouseDown(2,4)" onmouseup="fjaMouseUp(2,4)" id="2,4"></td>
+                        <td onmousedown="fjaMouseDown(3,4)" onmouseup="fjaMouseUp(3,4)" id="3,4"></td>
+                        <td onmousedown="fjaMouseDown(4,4)" onmouseup="fjaMouseUp(4,4)" id="4,4"></td>
+                        <td onmousedown="fjaMouseDown(5,4)" onmouseup="fjaMouseUp(5,4)" id="5,4"></td>
+                        <td onmousedown="fjaMouseDown(6,4)" onmouseup="fjaMouseUp(6,4)" id="6,4"></td>
+                        <td onmousedown="fjaMouseDown(7,4)" onmouseup="fjaMouseUp(7,4)" id="7,4"></td>
+                        <td onmousedown="fjaMouseDown(8,4)" onmouseup="fjaMouseUp(8,4)" id="8,4"></td>
+                        <td onmousedown="fjaMouseDown(9,4)" onmouseup="fjaMouseUp(9,4)" id="9,4"></td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td onmousedown="fjaMouseDown(0,5)" onmouseup="fjaMouseUp(0,5)" id="0,5"></td>
+                        <td onmousedown="fjaMouseDown(1,5)" onmouseup="fjaMouseUp(1,5)" id="1,5"></td>
+                        <td onmousedown="fjaMouseDown(2,5)" onmouseup="fjaMouseUp(2,5)" id="2,5"></td>
+                        <td onmousedown="fjaMouseDown(3,5)" onmouseup="fjaMouseUp(3,5)" id="3,5"></td>
+                        <td onmousedown="fjaMouseDown(4,5)" onmouseup="fjaMouseUp(4,5)" id="4,5"></td>
+                        <td onmousedown="fjaMouseDown(5,5)" onmouseup="fjaMouseUp(5,5)" id="5,5"></td>
+                        <td onmousedown="fjaMouseDown(6,5)" onmouseup="fjaMouseUp(6,5)" id="6,5"></td>
+                        <td onmousedown="fjaMouseDown(7,5)" onmouseup="fjaMouseUp(7,5)" id="7,5"></td>
+                        <td onmousedown="fjaMouseDown(8,5)" onmouseup="fjaMouseUp(8,5)" id="8,5"></td>
+                        <td onmousedown="fjaMouseDown(9,5)" onmouseup="fjaMouseUp(9,5)" id="9,5"></td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td onmousedown="fjaMouseDown(0,6)" onmouseup="fjaMouseUp(0,6)" id="0,6"></td>
+                        <td onmousedown="fjaMouseDown(1,6)" onmouseup="fjaMouseUp(1,6)" id="1,6"></td>
+                        <td onmousedown="fjaMouseDown(2,6)" onmouseup="fjaMouseUp(2,6)" id="2,6"></td>
+                        <td onmousedown="fjaMouseDown(3,6)" onmouseup="fjaMouseUp(3,6)" id="3,6"></td>
+                        <td onmousedown="fjaMouseDown(4,6)" onmouseup="fjaMouseUp(4,6)" id="4,6"></td>
+                        <td onmousedown="fjaMouseDown(5,6)" onmouseup="fjaMouseUp(5,6)" id="5,6"></td>
+                        <td onmousedown="fjaMouseDown(6,6)" onmouseup="fjaMouseUp(6,6)" id="6,6"></td>
+                        <td onmousedown="fjaMouseDown(7,6)" onmouseup="fjaMouseUp(7,6)" id="7,6"></td>
+                        <td onmousedown="fjaMouseDown(8,6)" onmouseup="fjaMouseUp(8,6)" id="8,6"></td>
+                        <td onmousedown="fjaMouseDown(9,6)" onmouseup="fjaMouseUp(9,6)" id="9,6"></td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td onmousedown="fjaMouseDown(0,7)" onmouseup="fjaMouseUp(0,7)" id="0,7"></td>
+                        <td onmousedown="fjaMouseDown(1,7)" onmouseup="fjaMouseUp(1,7)" id="1,7"></td>
+                        <td onmousedown="fjaMouseDown(2,7)" onmouseup="fjaMouseUp(2,7)" id="2,7"></td>
+                        <td onmousedown="fjaMouseDown(3,7)" onmouseup="fjaMouseUp(3,7)" id="3,7"></td>
+                        <td onmousedown="fjaMouseDown(4,7)" onmouseup="fjaMouseUp(4,7)" id="4,7"></td>
+                        <td onmousedown="fjaMouseDown(5,7)" onmouseup="fjaMouseUp(5,7)" id="5,7"></td>
+                        <td onmousedown="fjaMouseDown(6,7)" onmouseup="fjaMouseUp(6,7)" id="6,7"></td>
+                        <td onmousedown="fjaMouseDown(7,7)" onmouseup="fjaMouseUp(7,7)" id="7,7"></td>
+                        <td onmousedown="fjaMouseDown(8,7)" onmouseup="fjaMouseUp(8,7)" id="8,7"></td>
+                        <td onmousedown="fjaMouseDown(9,7)" onmouseup="fjaMouseUp(9,7)" id="9,7"></td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td onmousedown="fjaMouseDown(0,8)" onmouseup="fjaMouseUp(0,8)" id="0,8"></td>
+                        <td onmousedown="fjaMouseDown(1,8)" onmouseup="fjaMouseUp(1,8)" id="1,8"></td>
+                        <td onmousedown="fjaMouseDown(2,8)" onmouseup="fjaMouseUp(2,8)" id="2,8"></td>
+                        <td onmousedown="fjaMouseDown(3,8)" onmouseup="fjaMouseUp(3,8)" id="3,8"></td>
+                        <td onmousedown="fjaMouseDown(4,8)" onmouseup="fjaMouseUp(4,8)" id="4,8"></td>
+                        <td onmousedown="fjaMouseDown(5,8)" onmouseup="fjaMouseUp(5,8)" id="5,8"></td>
+                        <td onmousedown="fjaMouseDown(6,8)" onmouseup="fjaMouseUp(6,8)" id="6,8"></td>
+                        <td onmousedown="fjaMouseDown(7,8)" onmouseup="fjaMouseUp(7,8)" id="7,8"></td>
+                        <td onmousedown="fjaMouseDown(8,8)" onmouseup="fjaMouseUp(8,8)" id="8,8"></td>
+                        <td onmousedown="fjaMouseDown(9,8)" onmouseup="fjaMouseUp(9,8)" id="9,8"></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td onmousedown="fjaMouseDown(0,9)" onmouseup="fjaMouseUp(0,9)" id="0,9"></td>
+                        <td onmousedown="fjaMouseDown(1,9)" onmouseup="fjaMouseUp(1,9)" id="1,9"></td>
+                        <td onmousedown="fjaMouseDown(2,9)" onmouseup="fjaMouseUp(2,9)" id="2,9"></td>
+                        <td onmousedown="fjaMouseDown(3,9)" onmouseup="fjaMouseUp(3,9)" id="3,9"></td>
+                        <td onmousedown="fjaMouseDown(4,9)" onmouseup="fjaMouseUp(4,9)" id="4,9"></td>
+                        <td onmousedown="fjaMouseDown(5,9)" onmouseup="fjaMouseUp(5,9)" id="5,9"></td>
+                        <td onmousedown="fjaMouseDown(6,9)" onmouseup="fjaMouseUp(6,9)" id="6,9"></td>
+                        <td onmousedown="fjaMouseDown(7,9)" onmouseup="fjaMouseUp(7,9)" id="7,9"></td>
+                        <td onmousedown="fjaMouseDown(8,9)" onmouseup="fjaMouseUp(8,9)" id="8,9"></td>
+                        <td onmousedown="fjaMouseDown(9,9)" onmouseup="fjaMouseUp(9,9)" id="9,9"></td>
+                    </tr>
+                </table>
+            </div>
+            <br>
+            <div id="dgmZavrsio">
+                <button id='zavrsio' type="button" class="btn btn-light" onclick="otvoriNovProzor()">Zavrsio sam</button>
+            </div>
+            <br>
+            <div class="divPrBrodova">
+                <table class="table table-dark table-bordered table-fluid prBrodova" align="center">
+                    <tr>
+                        <td width = "25%" id="slikaKv1"><img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt=""></td>
+                        <td width = "25%" id="kv1">x4</td>
+                        <td width = "25%" id="slikaKv2">
+                            <img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt="">
+                            <img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt="">
+                        </td>
+                        <td width = "25%" id="kv2">x3</td>
+                    </tr>
+                    <tr>
+                        <td id="slikaKv3">
+                            <img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt="">
+                            <img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt="">
+                            <img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt="">
+                        </td>
+                        <td id="kv3">x2</td>
+                        <td id="slikaKv4">
+                            <img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt="">
+                            <img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt="">
+                            <img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt="">
+                            <img src="{% static '/chat/battleship-assets/plavi_kvadrat.png' %}" alt="">
+                        </td>
+                        <td id="kv4">x1</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>

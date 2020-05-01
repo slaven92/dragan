@@ -1,0 +1,76 @@
+<html>
+
+<head>
+    <title>Welcome</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'chat/css/battleship-style.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+
+<body onload="fjaInit()">
+    <div id="igraci_forma">
+        <div class="row">
+            <div class="col">
+                <h1>Dobrodosli u BATTLESHIP!</h1>
+            </div>
+        </div>
+        <div id='create-btn'>
+            <div class='row'>
+                <div class="col">
+                    <input id="channel-name" type="text"><br>
+                    <button class="btn btn-primary" onclick="handleNewGame(1)"'>Player1</button>
+                    <button class="btn btn-primary" onclick="handleNewGame(2)"'>Player2</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col" id='myform'>
+            <form name="mojaforma" autocomplete="off">
+                <table align="center">
+                    <tr id='player-one-name-input'>
+                        <td class="text-primary" id='hash_game_text'></td>
+                        <td class="text-primary">Igrac 1:&nbsp;</td>
+                        <td><input type="text" name="igrac1"></td>
+                    </tr>
+                    <tr id='player-two-name-input'>
+                        <td class="text-danger">Igrac 2:&nbsp;</td>
+                        <td><input type="text" name="igrac2"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="btn btn-outline-light" id='start-game' onclick="openWindowSetup()">Zapocni igru</td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <div id="pravila_igre">
+        <div class="row">
+            <div class=" col-12 col-sm-12 col-md-6">
+                <h3><i>Pravila igre</i></h3>
+                <p> Igru igraju dva igraca na tabli 10 x 10. Kolone table su oznacene slovima abecede, dok su vrste
+                    table
+                    oznacene brojevima. Na pocetku oba igraca tajno postavljaju brodove na svojoj tabli. Polja koja
+                    zauzima
+                    brod moraju da budu poravnata duz jedne linije, orjentisana horizontalno ili vertikalno. Brodovi
+                    se ne smeju dodirivati niti preklapati. Igra pocinje kada oba igraca postave sve brodove.
+                </p>
+                <p> Igra se odvija kao niz naizmenicnih poteza u kojima igrac na potezu obavestava protivnika o jednom
+                    polju na protivnickoj tabli koje gadja. Protivnik igracu odgovara da li je brod pogodjen ili
+                    promasen.
+                    U slucaju pogotka, igrac povlaci jos jedan potez. U slucaju pogotka poslednjeg polja koje zauzima
+                    brod,
+                    protivnik obavestava igraca da je brod potopljen i igrac povlaci jos jedan potez. U slucaju
+                    promasaja, potez igraca se zavrsava i prelazi se na protivnicki potez. Igra se zavrsava kada jedan
+                    od igraca potopi poslednji protivnicki brod.
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'chat/js/battleship-script.js' %}">
+        const slaven = "Ovo je test"
+    </script>
+</body>
+
+</html>

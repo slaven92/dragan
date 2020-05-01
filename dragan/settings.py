@@ -29,7 +29,7 @@ ALLOWED_HOSTS = ['slaven92.ddns.net', '192.168.0.14', '127.0.0.1']
 
 
 # Application definition
-
+# sudo docker run -p 6379:6379 -d redis:5
 INSTALLED_APPS = [
     'kviz.apps.KvizConfig',
     'django.contrib.admin',
@@ -38,7 +38,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
+    'chat',
 ]
+
+ASGI_APPLICATION = 'dragan.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -70,6 +82,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dragan.wsgi.application'
 
+# ASGI_APPLICATION = "dragan.routing.application"
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -119,5 +132,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+# STATIC_URL = 'http://slaven92.ddns.net:8000/static/'
+
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
