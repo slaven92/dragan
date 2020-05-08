@@ -1,20 +1,27 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
 
 # Register your models here.
 
-from .models import Question, Choice
+from .models import Question, Choice, Profile
 
 class ChoiceInline(admin.StackedInline):
     model = Choice
-    extra = 3
 
 class QuestionAdmin(admin.ModelAdmin):
-    fieldsets = [
-        ('Question', {'fields': ['question_text'], 'classes': ['collapse']}),
-    ]
     inlines = [ChoiceInline]
 
+class QuestionInLine(admin.StackedInline):
+    model = Question
+
+class UserAdmin(BaseUserAdmin):
+    inlines = (QuestionInLine,)
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice)
+admin.site.register(Profile)
 

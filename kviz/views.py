@@ -8,12 +8,15 @@ from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
 
 # Create your views here.
 from .models import Question, Choice
+from .serializers import QuestionSerializer, QuestionCreateSerializer
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
@@ -138,6 +141,9 @@ class Kviz2View(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'kviz/ajax.html', {})
 
+class ReactView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'kviz/react.html', {})
 
 ## helper functions
 def create_contex_for_kviz(request, error):
@@ -201,3 +207,19 @@ def is_answer_valid(request):
 
 def get_total_number():
     return len(get_list_or_404(Question))
+
+class QuestionsList(generics.ListAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+
+class QuestionDetail(generics.RetrieveAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+
+class QuestionCreate(generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Question.objects.all()
+    serializer_class = QuestionCreateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
