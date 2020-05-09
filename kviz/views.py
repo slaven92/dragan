@@ -10,19 +10,22 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
 
 # Create your views here.
 from .models import Question, Choice
-from .serializers import QuestionSerializer, QuestionCreateSerializer
+from .serializers import QuestionSerializer, QuestionCreateSerializer, SubmitSerializer
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
-        request.session['question_number'] = 1
-        request.session['result'] = []
-        return render(request, 'kviz/index.html', {})
+        # request.session['question_number'] = 1
+        # request.session['result'] = []
+        # return render(request, 'kviz/index.html', {})
+        return redirect('kviz:react')
 
 class ResultView(View):
     def get(self, request, *args, **kwargs):
@@ -223,3 +226,23 @@ class QuestionCreate(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
+
+
+class SubmitView(APIView):
+    def post(self, request, *args, **kwargs):
+        answers = SubmitSerializer(data = {"answer_list":request.data})
+        if answers.is_valid():
+            answers.save()
+            #TODO logic with answers to get the question
+
+            # logic here
+            images = IM_DIR+'*.jpeg'
+            image_list = glob.glob(images)
+            image_list_base = [ os.path.basename(p) for p in image_list ]
+            image_list_names = [ os.path.splitext(p)[0] for p in image_list_base ]
+            image_list_names.remove("blur")
+            #======================
+            result = random.choice(image_list_names)
+
+            return Response({"result" : result}, status=200)
+        return Response({'error':"Wrong list of answers"}, status=501)

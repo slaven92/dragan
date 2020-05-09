@@ -14,5 +14,6 @@ urlpatterns = [
     path('kviz3/', views.ReactView.as_view(), name='react'),
     path('api/questions/',views.QuestionsList.as_view()),
     path('api/questions/<int:pk>/', views.QuestionDetail.as_view()),
-    path('api/create/', views.QuestionCreate.as_view())
+    path('api/create/', views.QuestionCreate.as_view()),
+    path('api/submit/', views.SubmitView.as_view()),
 ]

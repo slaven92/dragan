@@ -5,7 +5,7 @@ from .models import Question, Choice
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
-        fields = ['choice_text']
+        fields = ['choice_text','votes']
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -36,3 +36,35 @@ class QuestionCreateSerializer(serializers.ModelSerializer):
         for choice in choices:
             Choice.objects.create(question=question, **choice)
         return question
+
+class ObjSerializer(serializers.Serializer):
+    question = serializers.CharField()
+    answer = serializers.CharField()
+
+    def validate(self, data):
+        qObj = Question.objects.filter(question_text=data['question'])
+        if not qObj:
+            raise serializers.ValidationError("That was not a valid question")
+        choices = qObj.first().choice_set.all()
+        
+        textList = []
+        for choice in choices:
+            textList.append(choice.choice_text)
+
+        if data['answer'] not in textList:
+            raise serializers.ValidationError("Wrong answer on one of the questions")
+
+        return data
+
+
+class SubmitSerializer(serializers.Serializer):
+    answer_list = ObjSerializer(many=True)
+
+    # TODO validate that all questions are different
+
+    def create(self, validated_data):
+        for obj in validated_data['answer_list']:
+            answObj = Choice.objects.get(choice_text=obj['answer'])
+            answObj.votes +=1
+            answObj.save()
+        return ""
