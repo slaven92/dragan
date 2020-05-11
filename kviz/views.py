@@ -12,13 +12,15 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
 
 # Create your views here.
 from .models import Question, Choice
-from .serializers import QuestionSerializer, QuestionCreateSerializer, SubmitSerializer
+from .serializers import QuestionSerializer, QuestionCreateSerializer, SubmitSerializer, QuestionAuthSerializer
+from .dev import DevAuthentication
 
 class IndexView(View):
     def get(self, request, *args, **kwargs):
@@ -212,20 +214,49 @@ def get_total_number():
     return len(get_list_or_404(Question))
 
 class QuestionsList(generics.ListAPIView):
+    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [SessionAuthentication, DevAuthentication]
     queryset = Question.objects.all()
-    serializer_class = QuestionSerializer
+    
+    def get_serializer_class(self):
+        if self.request.user.is_authenticated:
+            return QuestionAuthSerializer
+        return QuestionSerializer
+
 
 class QuestionDetail(generics.RetrieveAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
 class QuestionCreate(generics.CreateAPIView):
+    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [SessionAuthentication, DevAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Question.objects.all()
     serializer_class = QuestionCreateSerializer
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
+
+class ToggleVoteButton(APIView):
+    authentication_classes = [SessionAuthentication]
+    # authentication_classes = [SessionAuthentication, DevAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self,request, *args, **kwargs):
+        user = request.user
+        qObj = get_object_or_404(Question, question_text=request.data['question'])
+        votes = qObj.votes.all()
+        if votes.filter(pk=user.pk).exists():
+            print("sklonio")
+            qObj.votes.remove(user.pk)
+        else:
+            print("dodao")
+            qObj.votes.add(user.pk)
+
+        qObj.save()
+
+        return Response({"message":"success"}, status=200)
+
 
 
 class SubmitView(APIView):

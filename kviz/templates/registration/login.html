@@ -19,9 +19,9 @@
         <td>{{ form.password }}</td>
       </tr>
     </table>
-    <input type="submit" value="login" />
+    <input class="btn btn-primary" type="submit" value="Uloguj se" />
     <input type="hidden" name="next" value="{{ next }}" />
-    <a class="btn btn-primary" href="{% url 'kviz:signup'%}"> Kreiraj nalog </a>
+    <a class="btn btn-secondary" href="{% url 'kviz:signup'%}"> Kreiraj nalog </a>
   </form>
 
     {% if next %}

@@ -23,6 +23,33 @@ class QuestionSerializer(serializers.ModelSerializer):
     def get_votes(self, obj):
         return obj.votes.count()
 
+class QuestionAuthSerializer(serializers.ModelSerializer):
+    creator = serializers.SerializerMethodField(read_only=True)
+    votes = serializers.SerializerMethodField(read_only=True)
+    choice_set = ChoiceSerializer(many=True)
+    user_did_vote = serializers.SerializerMethodField(read_only=True)
+    curr_user = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Question
+        fields = ['creator','user_did_vote', 'curr_user', 'question_text', 'votes','choice_set']
+
+    def get_creator(self, obj):
+        return obj.creator.username
+
+    def get_votes(self, obj):
+        return obj.votes.count()
+
+    def get_curr_user(self, obj):
+        return self.context['request'].user.username
+
+    def get_user_did_vote(self, obj):
+        curr_user = self.context['request'].user
+        liked_by = obj.votes.all()
+        if curr_user in liked_by:
+            return True
+        return False
+
 class QuestionCreateSerializer(serializers.ModelSerializer):
     choice_set = ChoiceSerializer(many=True)
     

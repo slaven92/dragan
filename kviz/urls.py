@@ -16,4 +16,5 @@ urlpatterns = [
     path('api/questions/<int:pk>/', views.QuestionDetail.as_view()),
     path('api/create/', views.QuestionCreate.as_view()),
     path('api/submit/', views.SubmitView.as_view()),
+    path('api/toggle-vote/', views.ToggleVoteButton.as_view()),
 ]

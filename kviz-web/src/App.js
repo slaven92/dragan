@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import Header from './Header';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHeart as regular } from '@fortawesome/free-regular-svg-icons'
 import { faHeart as solid } from '@fortawesome/free-solid-svg-icons'
+
+// const global_url = "http://127.0.0.1:8000/"
+const global_url = "/"
 
 
 function App() {
@@ -11,11 +15,24 @@ function App() {
   const [isSet, setIsSet] = useState(false)
   const [currentQuestion, setCurrentQuestion] = useState(0)
   const [answers, setAnswers] = useState([])
+  const [isLogedInStatus, setIsLogedInStatus] = useState(false)
+  const [username, setUserName] = useState("Anonimus")
+  const [isCreateMod, setIsCreateMod] = useState(false)
+
   useEffect(() => {
     if (isSet === false) {
       loadQuestions((response, status) => {
         setQuestions([...response])
         setIsSet(true)
+        const firstObj = response[0]
+        if (firstObj.hasOwnProperty("curr_user")) {
+          setIsLogedInStatus(true)
+          setUserName(firstObj.curr_user)
+        }
+        else {
+          setIsLogedInStatus(false)
+          setUserName('Anonimus')
+        }
       })
     }
 
@@ -36,12 +53,50 @@ function App() {
   }
 
   const refresh = () => {
-    if(isSet===true){
+    if (isSet === true) {
       setIsSet(false)
       setCurrentQuestion(0)
     }
   }
 
+  const createQuestion = () => {
+    setIsCreateMod(true)
+  }
+
+  function submitNewQuestion (question, answers) {
+
+    var isValid = true
+
+    if (question === "") isValid = false
+
+    var obj = {
+      question_text: question,
+      choice_set: [],
+    }
+
+    answers.forEach(answer => {
+      if (answer !== ""){
+        obj.choice_set.push(
+          {
+            choice_text: answer
+          }
+        )
+      }
+    });
+
+    if(obj.choice_set === []) isValid = false
+
+    console.log(obj)
+    console.log(isValid)
+    if(isValid){
+      newQuestion(obj, (response, status) => {
+        if(status===201){
+          setIsCreateMod(false)
+        }
+      })
+    }
+
+  }
 
   if (isSet === true) {
 
@@ -53,12 +108,88 @@ function App() {
         </div>
       )
     }
-    return <Question question={questions[currentQuestion]} onClick={answerClicked} />
+    if (isCreateMod) {
+      return (
+        <div>
+          <Header onClick={createQuestion} username={username} isLogedIn={isLogedInStatus} />
+          <Create onClick={submitNewQuestion} />
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          <Header onClick={createQuestion} username={username} isLogedIn={isLogedInStatus} />
+          <Question question={questions[currentQuestion]} onClick={answerClicked} isLogedIn={isLogedInStatus} />
+        </div>
+      )
+    }
 
 
-  } else return <div>Loading</div>
+  } else {
+    return (
+      <div>
+        <Header />
+        Loading
+      </div>
+    )
+  }
 
 }
+
+function Create(props) {
+  const [question, setQuestion] = useState('')
+  const [answers, setAnswers] = useState(["",""])
+  const [numAnswers, setNumAnswers] = useState(2)
+
+  const handleChangeQuestion = (event)=>{
+    setQuestion(event.target.value)
+  }
+
+  const handleChangeAnswers = (target, index) =>{
+    var tmpAnswers = [...answers]
+    tmpAnswers[index] = target.value
+    setAnswers(tmpAnswers)
+  }
+
+  var odgovori = []
+  for (let index = 0; index < numAnswers; index++) {
+    odgovori.push(
+      <div key={index}>
+        <label>
+            <p>Odgovor {index+1}:</p>
+          <input type="text" value={answers[index]} onChange={(event)=>{handleChangeAnswers(event.target, index)}} />
+        </label>
+      </div>
+    )
+  }
+
+  function addAnswerField () {
+    setNumAnswers(numAnswers+1)
+    var tmpAnswers = [...answers]
+    tmpAnswers.push("")
+    setAnswers(tmpAnswers)
+  } 
+
+  return (
+    <div>
+      <form onSubmit={(event) => {event.preventDefault(); props.onClick(question, answers) }}>
+        <label>
+          <div>
+            <p className='h1'>Pitanje:</p>
+          </div>
+          <input type="text" value={question} onChange={handleChangeQuestion} />
+        </label>
+        <div>
+          <p className='h1'>Odgovori:</p>
+        </div>
+        {odgovori}
+        <input className='btn btn-primary' type="submit" value="Posalji pitanje" />
+      </form>
+      <button className='btn btn-secondary' onClick={addAnswerField} >Dodaj polje za odgovor</button>
+    </div>
+  )
+}
+
 
 function Result(props) {
 
@@ -77,11 +208,11 @@ function Result(props) {
       <div className='row justify-content-center'>
         <div className='col-sx'>
           <div className="card">
-            <img className="card-img-top" src={`http://127.0.0.1:8000/static/kviz/${result}.jpeg`} alt="Responsive" />
+            <img className="card-img-top" src={`${global_url}static/kviz/${result}.jpeg`} alt="Responsive" />
             <div className="card-body">
               <h5 className="card-title">{result}</h5>
               <p className="card-text">Ovo je jedan od mnogih verzija Dragana.</p>
-              <a href="/" onClick={()=>props.onClick()} className="btn btn-primary">Pocni opet</a>
+              <a href="/" onClick={() => props.onClick()} className="btn btn-primary">Pocni opet</a>
             </div>
           </div>
         </div>
@@ -95,7 +226,13 @@ function Question(props) {
   const answers = props.question ? props.question.choice_set : []
   const creator = props.question ? props.question.creator : ""
   const votes = props.question ? props.question.votes : 0
-  // const func = props.question ? props.question.onClick : ()=>{}
+  const isLogedIn = props.question ? props.isLogedIn : false
+  var didVote = false
+  if (props.question) {
+    if (props.question.user_did_vote===true) {
+      didVote = true
+    }
+  }
   return (
     <div>
       <div className="row justify-content-center">
@@ -115,14 +252,58 @@ function Question(props) {
         <div className="col-auto">
           <p> Pitanje postavio: {creator}</p>
         </div>
-        <div className="col-2">
-          <button className="btn btn-dark btn-block">
-            <FontAwesomeIcon icon={regular} /> <span className='badge badge-primary'>{votes}</span>
-          </button>
+        <div className="col-md-2 col-3">
+          <ActionButton votes={votes} isLogedIn={isLogedIn} didVote={didVote} question={text} />
         </div>
       </div>
     </div>
   );
+}
+
+function ActionButton(props) {
+  const [didVote, setDidVote] = useState(props.didVote)
+  const [votes, setVotes] = useState(props.votes)
+  useEffect(() => {
+    if (props.isLogedIn === true) {
+      window.$('[data-toggle="popover"]').popover('disable');
+    } else {
+      window.$('[data-toggle="popover"]').popover();
+    }
+  })
+
+  useEffect(()=>{
+    setDidVote(props.didVote)
+    setVotes(props.votes)
+  },[props.didVote, props.votes, props.question])
+
+  const handleAction = () => {
+    if (props.isLogedIn) {
+      const question = { "question": props.question }
+      toggleLike(question, (response, status) => {
+        if (didVote) {
+          setDidVote(false)
+          setVotes(votes - 1)
+        } else {
+          setDidVote(true)
+          setVotes(votes + 1)
+        }
+      })
+    }
+  }
+
+  if (props.isLogedIn && didVote) {
+    return (
+      <button id="popover" onClick={()=>{handleAction()}} className="btn btn-dark btn-block" data-container="body" data-toggle="popover" data-placement="left" data-content="Morate se prvo ulogovati!" >
+        <FontAwesomeIcon icon={solid} /> <span className='badge badge-primary'>{votes}</span>
+      </button>
+    )
+  } else {
+    return (
+      <button id="popover" onClick={()=>{handleAction()}} className="btn btn-dark btn-block" data-container="body" data-toggle="popover" data-placement="left" data-content="Vivamus sagittis lacus vel augue laoreet rutrum faucibus." >
+        <FontAwesomeIcon icon={regular} /> <span className='badge badge-primary'>{votes}</span>
+      </button>
+    )
+  }
 }
 
 function Answers(props) {
@@ -146,7 +327,7 @@ function lookup(method, endpoint, callback, data) {
     jsonData = JSON.stringify(data)
   }
   const xhr = new XMLHttpRequest()
-  const url = `http://127.0.0.1:8000/api${endpoint}`
+  const url = `${global_url}api${endpoint}`
   xhr.responseType = "json"
   xhr.open(method, url)
   const csrftoken = getCookie('csrftoken');
@@ -190,6 +371,14 @@ function postAnswer(listOfAnswers, callback) {
 
 function loadQuestions(callback) {
   lookup("GET", "/questions/", callback)
+}
+
+function toggleLike(question, callback) {
+  lookup("POST", "/toggle-vote/", callback, question)
+}
+
+function newQuestion(fullObj, callback) {
+  lookup("POST", "/create/", callback, fullObj)
 }
 
 export default App;
