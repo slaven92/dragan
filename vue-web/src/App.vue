@@ -39,8 +39,7 @@
             <v-list-item-title v-else>Prijavi se</v-list-item-title>
           </v-list-item>
 
-          <v-list-item v-if="isLoggedIn">
-          <!-- <v-list-item @click="goToAddQuestion"> -->
+          <v-list-item v-if="isLoggedIn" @click="goToAddQuestion">
             <v-list-item-icon>
               <v-icon>mdi-plus</v-icon>
             </v-list-item-icon>
