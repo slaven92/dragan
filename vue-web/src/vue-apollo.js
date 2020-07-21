@@ -8,8 +8,11 @@ Vue.use(VueApollo)
 // Name of the localStorage item
 const AUTH_TOKEN = 'apollo-token'
 
+// const basePath = "http://127.0.0.1:8000/"
+const basePath = "/"
+
 // Http endpoint
-const httpEndpoint = process.env.VUE_APP_GRAPHQL_HTTP || '/graphql'
+const httpEndpoint = process.env.VUE_APP_GRAPHQL_HTTP || basePath + 'graphql'
 // Files URL root
 export const filesRoot = process.env.VUE_APP_FILES_ROOT || httpEndpoint.substr(0, httpEndpoint.indexOf('/graphql'))
 

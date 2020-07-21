@@ -26,7 +26,7 @@
                 <p>Pitao:{{question.creator.username}}</p>
             </v-col>
             <v-col lg="4" style="text-align:right;">
-                <v-btn color="secondary">{{question.voteCount}}
+                <v-btn @click="$emit('doVote', question.id)" color="secondary">{{question.voteCount}}
                     <v-icon v-if="question.userDidVote" dark right>mdi-heart</v-icon>
                     <v-icon v-else dark right>mdi-heart-outline</v-icon>
                 </v-btn>
@@ -43,7 +43,8 @@ export default {
             questionText: String,
             creator: Object,
             voteCount: Number,
-        }
+            userDidVote: Boolean
+        },
     }
 }
 </script>

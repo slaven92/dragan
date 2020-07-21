@@ -30,18 +30,21 @@
         <v-list-item-group
           v-model="group"
         >
-          <v-list-item>
-            <v-list-item-icon>
-              <v-icon>mdi-home</v-icon>
-            </v-list-item-icon>
-            <v-list-item-title>Home</v-list-item-title>
-          </v-list-item>
 
-          <v-list-item>
+          <v-list-item @click="doLoginOrLogout">
             <v-list-item-icon>
               <v-icon>mdi-account</v-icon>
             </v-list-item-icon>
-            <v-list-item-title>Account</v-list-item-title>
+            <v-list-item-title v-if="isLoggedIn">Odjavi se</v-list-item-title>
+            <v-list-item-title v-else>Prijavi se</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item v-if="isLoggedIn">
+          <!-- <v-list-item @click="goToAddQuestion"> -->
+            <v-list-item-icon>
+              <v-icon>mdi-plus</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Dodaj pitanje</v-list-item-title>
           </v-list-item>
 
         </v-list-item-group>
@@ -52,7 +55,8 @@
 
 
     <v-main>
-      <ApolloExample/>
+      <AddQuestion v-if="addQuestion" @updateQuery="doUpdateQuestion"/>
+      <ApolloExample v-else ref="qq"/>
     </v-main>
 
 
@@ -60,17 +64,55 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
 import ApolloExample from './components/ApolloExample';
+import AddQuestion from './components/AddQuestion';
 
 export default {
   name: 'App',
 
   components: {
     ApolloExample,
+    AddQuestion,
   },
 
   data: () => ({
     drawer: false,
+    isLoggedIn: false,
+    addQuestion: false,
   }),
+
+  apollo:{
+    isLoggedIn: gql`query {
+      isLoggedIn
+    }`,
+  },
+  methods: { 
+    doLoginOrLogout:function (){
+
+      // const basePath = "http://127.0.0.1:8000/"
+      const basePath = "/"
+
+      if (this.isLoggedIn) {
+        window.location.href = basePath + "accounts/logout/"
+      } else{
+        window.location.href = basePath + "accounts/login/?next=" + basePath
+      }
+    },
+    goToAddQuestion: function(){
+      this.addQuestion = true
+    },
+
+
+    forRef: function () {
+      this.$refs.qq.onDoAgain()
+    },
+
+    doUpdateQuestion:function () {
+      this.addQuestion = false
+      this.forRef()
+    }
+  }
+
 };
 </script>
