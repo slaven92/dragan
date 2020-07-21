@@ -42,7 +42,16 @@ INSTALLED_APPS = [
     'chat',
     'rest_framework',
     'corsheaders',
+    'graphene_django',
 ]
+
+GRAPHENE = {
+    'SCHEMA': 'dragan.schema.schema',
+    'MIDDLEWARE': [
+        'graphene_django.debug.DjangoDebugMiddleware',
+    ]
+}
+
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

@@ -1,0 +1,25 @@
+query HelloWorld {
+  isLoggedIn
+  allQuestions {
+    edges {
+      node {
+        id
+        questionText
+        voteCount
+        userDidVote
+        creator{
+          username
+        }
+        choiceSet {
+          edges {
+            node {
+              id
+              choiceText
+              votes
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,43 @@
+upstream channels-backend {
+    server 127.0.0.1:3000;
+}
+
+server {
+    server_name slaven92.ddns.net;
+    listen 80;
+
+    location = /favicon.ico {access_log off; log_not_found off;}
+
+    location /static/ {
+	root /home/slaven92/draganKviz/dragan;
+    }
+
+    location / {
+	proxy_redirect off;
+	include proxy_params;
+	
+	proxy_http_version 1.1;
+	proxy_set_header Upgrade $http_upgrade;
+	proxy_set_header Connection "upgrade";
+
+
+	proxy_pass http://channels-backend;
+
+    }
+    listen 443 ssl http2; # managed by Certbot
+	
+#    location = /static/kviz/js/2.360f71b3.chunk.js {
+#	root /home/slaven92/draganKviz/dragan;
+#	http2_push_preload on;
+#        http2_push /static/kviz/js/main.04a64d73.chunk.js;
+#        http2_push /static/kviz/css/main.378db16b.chunk.css;
+#    }
+
+    ssl_certificate /etc/letsencrypt/live/slaven92.ddns.net/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/slaven92.ddns.net/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+
+}
+
+

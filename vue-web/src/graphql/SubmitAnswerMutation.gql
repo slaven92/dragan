@@ -1,0 +1,5 @@
+mutation slaven($answerss:SubmitAnswersMutationInput!){
+ 	submitAnswers(input:$answerss){
+  	    message
+	}
+}

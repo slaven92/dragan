@@ -27,7 +27,8 @@ class IndexView(View):
         # request.session['question_number'] = 1
         # request.session['result'] = []
         # return render(request, 'kviz/index.html', {})
-        return redirect('kviz:react')
+        # return redirect('kviz:react')
+        return redirect('kviz:vue')
 
 class ResultView(View):
     def get(self, request, *args, **kwargs):
@@ -103,7 +104,7 @@ class SignupView(View):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('kviz:kviz')
+            return redirect('kviz:react')
         return render(request, 'registration/signup.html', {'form': form})
 
 class AjaxView(View):
@@ -149,6 +150,10 @@ class Kviz2View(View):
 class ReactView(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'kviz/react.html', {})
+
+class VueView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'kviz/vue.html', {})
 
 ## helper functions
 def create_contex_for_kviz(request, error):

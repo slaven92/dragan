@@ -12,6 +12,7 @@ urlpatterns = [
     path('ajax/', views.AjaxView.as_view(), name='ajax'),
     path('kviz2/', views.Kviz2View.as_view(), name='kviz2',),
     path('kviz3/', views.ReactView.as_view(), name='react'),
+    path('kviz4/', views.VueView.as_view(), name='vue'),
     path('api/questions/',views.QuestionsList.as_view()),
     path('api/questions/<int:pk>/', views.QuestionDetail.as_view()),
     path('api/create/', views.QuestionCreate.as_view()),
