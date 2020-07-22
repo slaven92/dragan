@@ -50,5 +50,6 @@ toml==0.10.0
 Twisted==20.3.0
 txaio==20.4.1
 Unidecode==1.1.1
+whitenoise==5.1.0
 wrapt==1.12.1
 zope.interface==5.1.0
