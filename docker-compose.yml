@@ -14,7 +14,7 @@ services:
             # - "443:443"
         volumes:
             - ./nginx.conf:/etc/nginx/nginx.conf
-            - /etc/nginx/proxy_params:/etc/nginx/proxy_params
+            - ./etc/nginx/proxy_params:/etc/nginx/proxy_params
             - ./static:/home/slaven92/draganKviz/dragan/static/
 
     web:
@@ -29,7 +29,7 @@ services:
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres
         ports:
-            - "5432:5432"
+            - "5432"
 
     # pihole:
     #     image: pihole/pihole:latest
