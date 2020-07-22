@@ -114,14 +114,11 @@ WSGI_APPLICATION = 'dragan.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        # 'HOST': 'db',
-        'HOST': 'localhost',
-        'PORT': 5432,
     }
 }
+import dj_database_url
+
+DATABASES = { 'default' : dj_database_url.config()}
 
 
 # Password validation
