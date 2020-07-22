@@ -1,1 +1,1 @@
-web: daphne -b 0.0.0.0 -p 80 --access-log - --proxy-headers dragan.asgi:application
+web: daphne -b 0.0.0.0 -p $PORT --access-log - --proxy-headers dragan.asgi:application
