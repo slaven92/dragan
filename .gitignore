@@ -154,3 +154,5 @@ yarn-error.log*
 
 /static
 /etc-pihole
+
+db.json
