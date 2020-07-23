@@ -1,4 +1,6 @@
 from django.urls import path
+from django.views.decorators.cache import cache_page
+
 
 from . import views
 
@@ -13,7 +15,7 @@ urlpatterns = [
     path('kviz2/', views.Kviz2View.as_view(), name='kviz2',),
     path('kviz3/', views.ReactView.as_view(), name='react'),
     path('kviz4/', views.VueView.as_view(), name='vue'),
-    path('api/questions/',views.QuestionsList.as_view()),
+    path('api/questions/',cache_page(60*10)(views.QuestionsList.as_view())),
     path('api/questions/<int:pk>/', views.QuestionDetail.as_view()),
     path('api/create/', views.QuestionCreate.as_view()),
     path('api/submit/', views.SubmitView.as_view()),

@@ -27,6 +27,26 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['slaven92.ddns.net', '192.168.0.14', '127.0.0.1', 'localhost', '192.168.1.67', 'dragan-kviz.herokuapp.com']
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': 'memcached:11211',
+    }
+}
+
+# DEBUG_TOOLBAR_CONFIG = {
+#     "SHOW_TOOLBAR_CALLBACK" : lambda request: True,
+# }
+
+
+INTERNAL_IPS = [
+    # ...
+    '*',
+    '127.0.0.1',
+    'localhost'
+    # ...
+]
+
 
 # Application definition
 # sudo docker run -p 6379:6379 -d redis:5
@@ -43,6 +63,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'graphene_django',
+    'debug_toolbar',
 ]
 
 GRAPHENE = {
@@ -76,6 +97,7 @@ CHANNEL_LAYERS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',

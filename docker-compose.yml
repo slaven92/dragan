@@ -14,13 +14,22 @@ services:
             # - "443:443"
         volumes:
             - ./nginx.conf:/etc/nginx/nginx.conf
-            - ./etc/nginx/proxy_params:/etc/nginx/proxy_params
+            - /etc/nginx/proxy_params:/etc/nginx/proxy_params
             - ./static:/home/slaven92/draganKviz/dragan/static/
+        depends_on: 
+            - web
 
     web:
         build: .
         ports: 
             - "8000"
+        volumes:
+            - .:/dragan/
+        depends_on: 
+            - db
+            - redis
+        entrypoint: ["python", "/dragan/manage.py", "runserver", "0.0.0.0:8000"]
+
 
     db:
         image: postgres
@@ -30,6 +39,11 @@ services:
             - POSTGRES_PASSWORD=postgres
         ports:
             - "5432"
+    
+    memcached:
+        image: memcached
+        ports: 
+            - "11211"
 
     # pihole:
     #     image: pihole/pihole:latest
