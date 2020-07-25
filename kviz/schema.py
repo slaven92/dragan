@@ -8,6 +8,19 @@ from django.contrib.auth.models import User
 from .models import Question, Choice
 from django.db.models import F
 import os, glob, random
+from graphene_django.debug import DjangoDebug
+
+
+from promise import Promise
+from promise.dataloader import DataLoader
+
+class ChoiceLoader(DataLoader):
+    def batch_load_fn(self, keys):
+        # Here we return a promise that will result on the
+        # corresponding user for each key in keys
+        choices = {choice.id: choice for choice in Choice.objects.filter(pk__in=keys)}
+        return Promise.resolve([choices.get(choice_id) for choice_id in keys])
+
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
@@ -39,6 +52,10 @@ class QuestionNode(DjangoObjectType):
             return False
 
         return self.votes.filter(pk=info.context.user.id).exists()
+
+    # def resolve_choice_set(self, info):
+    #     choise_loader = ChoiceLoader()
+    #     return choise_loader.load_many([ choice.id  for choice in self.choice_set.all()])
 
 
 class ChoiceNode(DjangoObjectType):
@@ -86,6 +103,7 @@ class VoteMutation(relay.ClientIDMutation):
 
     question = Field(QuestionNode)
     message = String()
+    debug = Field(DjangoDebug, name='_debug')
 
     @classmethod
     def mutate_and_get_payload(self, root, info, id):
