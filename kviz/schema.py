@@ -9,179 +9,233 @@ from .models import Question, Choice
 from django.db.models import F
 import os, glob, random
 from graphene_django.debug import DjangoDebug
+from django.core.cache import cache
 
 
 from promise import Promise
 from promise.dataloader import DataLoader
+from collections import defaultdict
 
 class ChoiceLoader(DataLoader):
-    def batch_load_fn(self, keys):
+    def batch_load_fn(self, question_keys):
         # Here we return a promise that will result on the
         # corresponding user for each key in keys
-        choices = {choice.id: choice for choice in Choice.objects.filter(pk__in=keys)}
-        return Promise.resolve([choices.get(choice_id) for choice_id in keys])
 
+        choices = defaultdict(list)
+
+
+        for choice in Choice.objects.filter(question_id__in=question_keys).iterator():
+            choices[choice.question_id].append(choice)
+        
+        print(choices)
+
+
+        return Promise.resolve([choices.get(question_id, []) for question_id in question_keys])
+
+choice_loader = ChoiceLoader()
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
 
-class QuestionNode(DjangoObjectType):
-    """
-    Question Node gives information about questions
-    """
-
-    vote_count = Int()
-    user_did_vote = Boolean()
-
-    class Meta:
-        model = Question
-        filter_fields = ['question_text']
-        interfaces = (relay.Node, )
-
-    def resolve_vote_count(self, info):
-        return self.votes.count()
-
-    def resolve_votes(self, info):
-        if not info.context.user.is_authenticated:
-            return User.objects.none()
-        
-        return self.votes.all()
-
-    def resolve_user_did_vote(self, info):
-        if not info.context.user.is_authenticated:
-            return False
-
-        return self.votes.filter(pk=info.context.user.id).exists()
-
-    # def resolve_choice_set(self, info):
-    #     choise_loader = ChoiceLoader()
-    #     return choise_loader.load_many([ choice.id  for choice in self.choice_set.all()])
 
 
-class ChoiceNode(DjangoObjectType):
+class ChoiceNode(ObjectType):
     """
     Choices of a related question
     """
     class Meta:
-        model = Choice
-        filter_fields = {
-            'choice_text': ['exact', 'icontains', 'istartswith'],
-            'question': ['exact'],
-        }
         interfaces = (relay.Node, )
 
-class UserNode(DjangoObjectType):
+    choice_text = String()
+
+    @classmethod
+    def get_node(cls, info, id):
+        return Choice.objects.get(pk=id)
+
+    def resolve_choice_text(self, info):
+        return self.choice_text
+
+class ChoiceConnection(relay.Connection):
+    class Meta:
+        node = ChoiceNode
+
+
+
+
+
+class QuestionNode(ObjectType):
+    """
+    Question Node gives information about questions
+    """
+
+    question_text = String()
+    choices = relay.ConnectionField(ChoiceConnection)
+
+    class Meta:
+        interfaces = (relay.Node, )
+
+    def resolve_question_text(self, info):
+        return self.question_text
+
+    def resolve_choices(self, info):
+        # return self.choice_set.all()
+        return choice_loader.load(self.id)
+
+    @classmethod
+    def get_node(cls, info, id):
+        return Question.objects.get(pk=id)
+
+class QuestionConnection(relay.Connection):
+    class Meta:
+        node = QuestionNode
+
+
+
+
+class UserNode(ObjectType):
     """
     User node gives info about usernames
     """
     class Meta:
-        model = User
-        filter_fields = ['username']
-        fields = ('username',)
         interfaces = (relay.Node, )
+
+    username = String()
+
+    @classmethod
+    def get_node(cls, info, id):
+        return User.objects.get(pk=id)
+
+    def resolve_username(self, info):
+        return self.username
+
+class UserConnection(relay.Connection):
+    class Meta:
+        node = UserNode
+
+
+
 
 class Query(ObjectType):
     question = relay.Node.Field(QuestionNode)
-    all_questions = DjangoFilterConnectionField(QuestionNode)
+    all_questions = relay.ConnectionField(QuestionConnection)
 
     choice = relay.Node.Field(ChoiceNode)
-    # all_choices = DjangoFilterConnectionField(ChoiceNode)
+    all_choices = relay.ConnectionField(ChoiceConnection)
 
-    # user = relay.Node.Field(UserNode)
-    # all_users = DjangoFilterConnectionField(UserNode)
+    user = relay.Node.Field(UserNode)
+    all_users = relay.ConnectionField(UserConnection)
 
-    is_logged_in = Boolean()
+    # is_logged_in = Boolean()
 
-    def resolve_is_logged_in(parent, info):
-        return info.context.user.is_authenticated
+    # def resolve_is_logged_in(parent, info):
+    #     return info.context.user.is_authenticated
 
+    def resolve_all_questions(self, info):
 
-class VoteMutation(relay.ClientIDMutation):
+        questions = cache.get("questions")
 
-    class Input:
-        id = String()
-
-    question = Field(QuestionNode)
-    message = String()
-    debug = Field(DjangoDebug, name='_debug')
-
-    @classmethod
-    def mutate_and_get_payload(self, root, info, id):
-
-        if not info.context.user.is_authenticated:
-            message = "You are not logged in"
-            return VoteMutation(question=None, message=message)
-
-        question = Question.objects.get(pk=from_global_id(id)[1])
-
-        votes = question.votes.all()
-
-        if votes.filter(pk=info.context.user.pk).exists():
-            message = "Removed Vote"
-            question.votes.remove(info.context.user.pk)
+        if questions:
+            print("nasli")
         else:
-            message = "Voted"
-            question.votes.add(info.context.user.pk)
+            questions = Question.objects.all()
+            cache.set("questions", questions, 300)
+        
+        return questions
 
-        return VoteMutation(question=question, message=message)
+    def resolve_all_choices(self, info):
+        return Choice.objects.all()
 
-# ------- mutation
-class CreateQuestionMutation(relay.ClientIDMutation):
-    class Input:
-        question_text = String(required=True)
-        choices = List(String,required=True)
-
-    question = Field(QuestionNode)
-    message = String()
-
-    @classmethod
-    def mutate_and_get_payload(self, root, info, question_text, choices):
-
-        if not info.context.user.is_authenticated:
-            message = "You are not logged in"
-            return CreateQuestionMutation(question=None, message=message)
-
-        question = Question.objects.create(question_text=question_text, creator = info.context.user)
+    def resolve_all_users(self, info):
+        return User.objects.all()
 
 
-        for choice in choices:
-            Choice.objects.create(question=question, choice_text=choice)
+# class VoteMutation(relay.ClientIDMutation):
 
-        question.save()
-        message = "OK"
-        return VoteMutation(question=question, message=message)
+#     class Input:
+#         id = String()
 
-class AnswerSubmitInputType(InputObjectType):
-        question_id = String(required=True)
-        choice_id = String(required=True)
+#     question = Field(QuestionNode)
+#     message = String()
+#     debug = Field(DjangoDebug, name='_debug')
+
+#     @classmethod
+#     def mutate_and_get_payload(self, root, info, id):
+
+#         if not info.context.user.is_authenticated:
+#             message = "You are not logged in"
+#             return VoteMutation(question=None, message=message)
+
+#         question = Question.objects.get(pk=from_global_id(id)[1])
+
+#         votes = question.votes.all()
+
+#         if votes.filter(pk=info.context.user.pk).exists():
+#             message = "Removed Vote"
+#             question.votes.remove(info.context.user.pk)
+#         else:
+#             message = "Voted"
+#             question.votes.add(info.context.user.pk)
+
+#         return VoteMutation(question=question, message=message)
+
+# # ------- mutation
+# class CreateQuestionMutation(relay.ClientIDMutation):
+#     class Input:
+#         question_text = String(required=True)
+#         choices = List(String,required=True)
+
+#     question = Field(QuestionNode)
+#     message = String()
+
+#     @classmethod
+#     def mutate_and_get_payload(self, root, info, question_text, choices):
+
+#         if not info.context.user.is_authenticated:
+#             message = "You are not logged in"
+#             return CreateQuestionMutation(question=None, message=message)
+
+#         question = Question.objects.create(question_text=question_text, creator = info.context.user)
 
 
-class SubmitAnswersMutation(relay.ClientIDMutation):
-    class Input:
-        answer_list = List(AnswerSubmitInputType, required=True)
+#         for choice in choices:
+#             Choice.objects.create(question=question, choice_text=choice)
 
-    message = String()
+#         question.save()
+#         message = "OK"
+#         return VoteMutation(question=question, message=message)
 
-    @classmethod
-    def mutate_and_get_payload(self, root, info, answer_list):
+# class AnswerSubmitInputType(InputObjectType):
+#         question_id = String(required=True)
+#         choice_id = String(required=True)
 
-        for answer in answer_list:
-            ans = Question.objects.get(pk=from_global_id(answer.question_id)[1]).choice_set.get(pk=from_global_id(answer.choice_id)[1])
-            ans.votes = F('votes') + 1
-            ans.save()
 
-        images = IM_DIR+'*.jpeg'
-        image_list = glob.glob(images)
-        image_list_base = [ os.path.basename(p) for p in image_list ]
-        image_list_names = [ os.path.splitext(p)[0] for p in image_list_base ]
-        image_list_names.remove("blur")
-        result = random.choice(image_list_names)
-        return VoteMutation(message=result)
+# class SubmitAnswersMutation(relay.ClientIDMutation):
+#     class Input:
+#         answer_list = List(AnswerSubmitInputType, required=True)
+
+#     message = String()
+
+#     @classmethod
+#     def mutate_and_get_payload(self, root, info, answer_list):
+
+#         for answer in answer_list:
+#             ans = Question.objects.get(pk=from_global_id(answer.question_id)[1]).choice_set.get(pk=from_global_id(answer.choice_id)[1])
+#             ans.votes = F('votes') + 1
+#             ans.save()
+
+#         images = IM_DIR+'*.jpeg'
+#         image_list = glob.glob(images)
+#         image_list_base = [ os.path.basename(p) for p in image_list ]
+#         image_list_names = [ os.path.splitext(p)[0] for p in image_list_base ]
+#         image_list_names.remove("blur")
+#         result = random.choice(image_list_names)
+#         return VoteMutation(message=result)
 
 class Mutation(ObjectType):
-    vote = VoteMutation.Field()
-    create_question = CreateQuestionMutation.Field()
-    submit_answers = SubmitAnswersMutation.Field()
+    pass
+    # vote = VoteMutation.Field()
+    # create_question = CreateQuestionMutation.Field()
+    # submit_answers = SubmitAnswersMutation.Field()
 
 
 
