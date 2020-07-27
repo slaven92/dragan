@@ -13,14 +13,25 @@ from graphene_django.debug import DjangoDebug
 
 from promise import Promise
 from promise.dataloader import DataLoader
+from collections import defaultdict
 
 class ChoiceLoader(DataLoader):
-    def batch_load_fn(self, keys):
+    def batch_load_fn(self, question_keys):
         # Here we return a promise that will result on the
         # corresponding user for each key in keys
-        choices = {choice.id: choice for choice in Choice.objects.filter(pk__in=keys)}
-        return Promise.resolve([choices.get(choice_id) for choice_id in keys])
 
+        choices = defaultdict(list)
+
+
+        for choice in Choice.objects.filter(question_id__in=question_keys).iterator():
+            choices[choice.question_id].append(choice)
+        
+        print(choices)
+
+
+        return Promise.resolve([choices.get(question_id, []) for question_id in question_keys])
+
+choice_loader = ChoiceLoader()
 
 DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IM_DIR = os.path.join(DIR, 'kviz/static/kviz/')
