@@ -64,9 +64,8 @@ class QuestionNode(DjangoObjectType):
 
         return self.votes.filter(pk=info.context.user.id).exists()
 
-    # def resolve_choice_set(self, info):
-    #     choise_loader = ChoiceLoader()
-    #     return choise_loader.load_many([ choice.id  for choice in self.choice_set.all()])
+    def resolve_choice_set(self, info):
+        return choice_loader.load(self.id)
 
 
 class ChoiceNode(DjangoObjectType):
