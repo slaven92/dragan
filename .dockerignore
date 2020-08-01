@@ -1,4 +1,10 @@
 # comment
 */node_modules
 
-db.json
+/static
+/etc-pihole
+/etc-dnsmasq.d
+/env2
+/locust
+nginx.conf
+dragan1

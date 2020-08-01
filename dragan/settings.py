@@ -20,12 +20,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '9vtqrbo!*!#0)ljlt&m)vg^#6wb3n-4r&(6lg5a*tu!3)#2u8u'
+SECRET_KEY = os.getenv('SECRET_KEY','9vtqrbo!*!#0)ljlt&m)vg^#6wb3n-4r&(6lg5a*tu!3)#2u8u')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['slaven92.ddns.net', '192.168.0.14', '127.0.0.1', 'localhost', '192.168.1.67', 'dragan-kviz.herokuapp.com', 'dragan-kviz-2.herokuapp.com', 'dragan-dragan-kviz.apps.us-east-1.starter.openshift-online.com']
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS', "*")]
 
 CACHES = {
     'default': {
@@ -39,13 +39,13 @@ CACHES = {
 # }
 
 
-INTERNAL_IPS = [
-    # ...
-    '*',
-    '127.0.0.1',
-    'localhost'
-    # ...
-]
+# INTERNAL_IPS = [
+#     # ...
+#     '*',
+#     '127.0.0.1',
+#     'localhost'
+#     # ...
+# ]
 
 
 # Application definition
@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'graphene_django',
-    'debug_toolbar',
 ]
 
 GRAPHENE = {
@@ -97,7 +96,6 @@ CHANNEL_LAYERS = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -144,10 +142,10 @@ WSGI_APPLICATION = 'dragan.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'NAME': os.getenv('DB_NAME','postgres'),
+        'USER': os.getenv('DB_USER','postgres'),
+        'PASSWORD': os.getenv('DB_PASSWORD','postgres'),
+        'HOST': os.getenv('DB_HOST','db'),
         'PORT': 5432,
     }
 }
@@ -200,4 +198,4 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
