@@ -1,5 +1,4 @@
-query HelloWorld {
-  isLoggedIn
+query data {
   allQuestions {
     edges {
       node {

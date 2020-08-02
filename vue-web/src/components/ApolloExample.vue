@@ -1,42 +1,28 @@
 <template>
   <div class="apollo-example">
-    <!-- Apollo watched Graphql query -->
-    <ApolloQuery
-      ref="queryComponentRef"
-      :query="require('../graphql/HelloWorld.gql')"
-      :update="update"
-      @updateQuery="onDoAgain"
-    >
-      <template slot-scope="{ result: { loading, error, data }, query }">
-        <!-- Loading -->
 
-        <div v-if="loading" class="loading apollo">Loading...</div>
+    <div v-if="$apollo.loading">Loading...</div>
 
-        <!-- Error -->
-        <div v-else-if="error" class="error apollo">An error occured</div>
+    <div v-else>
 
-        <!-- Result -->
-        <div v-else-if="data" class="result apollo">
-          <v-progress-linear
-            height="15"
-            :value="(currentQuestion+1)/totalNumberOfQuestions*100"
-            rounded
-          >{{currentQuestion+1}} / {{totalNumberOfQuestions}}</v-progress-linear>
+        <v-progress-linear
+          height="15"
+          :value="(currentQuestion+1)/totalNumberOfQuestions*100"
+          rounded
+        >{{currentQuestion+1}} / {{totalNumberOfQuestions}}</v-progress-linear>
 
-          <div v-if="!isEnd">
-            <SingleQuestion
-              @doVote="doVote"
-              :question="data.allQuestions.edges[currentQuestion].node"
-              v-on:submit-answer="onSubmitAnswer"
-            />
-          </div>
-          <div v-else>
-            <Result :answers="submitedAnswers" v-on:do-again="onDoAgain(query)" />
-          </div>
+
+        <div v-if="!isEnd">
+          <SingleQuestion
+            @doVote="doVote"
+            :question="allQuestions.edges[currentQuestion].node"
+            @submit-answer="onSubmitAnswer"
+          />
+        </div>
+        <div v-else>
+          <Result :answers="submitedAnswers" @do-again="onDoAgain(query)" />
         </div>
 
-        <!-- No result -->
-        <div v-else class="no-result apollo">Loading...</div>
 
         <v-container>
           <v-row align="center" align-content="center" justify="center">
@@ -51,8 +37,9 @@
             </v-col>
           </v-row>
         </v-container>
-      </template>
-    </ApolloQuery>
+    
+    </div>
+
   </div>
 </template>
 
@@ -62,20 +49,34 @@ import SingleQuestion from "./SingleQuestion";
 import Result from "./Result";
 
 export default {
+  apollo: {
+    allQuestions: require('../graphql/HelloWorld.gql'),
+    isLoggedIn: gql`query{
+      isLoggedIn
+    }
+    `,
+  },
+
   data() {
     return {
       currentQuestion: 0,
       submitedAnswers: [],
-      totalNumberOfQuestions: 10,
       isEnd: false,
-      alert: false
+      alert: false,
+      allQuestions: [],
     };
   },
 
   components: { SingleQuestion, Result },
 
+  computed: {
+      totalNumberOfQuestions: function (){
+        return this.allQuestions.edges.length
+      }
+  },
+
   methods: {
-    onSubmitAnswer: function(answerId, questionId) {
+    onSubmitAnswer: function (answerId, questionId) {
       if (this.currentQuestion >= this.totalNumberOfQuestions - 1) {
         this.isEnd = true;
       } else {
@@ -84,20 +85,35 @@ export default {
       this.submitedAnswers.push({ choiceId: answerId, questionId: questionId });
     },
 
-    update: function(data) {
-      this.totalNumberOfQuestions = data.allQuestions.edges.length;
-      return data;
-    },
-
-    onDoAgain: function(query) {
+    onDoAgain: function () {
       this.currentQuestion = 0;
-      this.submitedAnswers = [];
       this.isEnd = false;
-      query.refetch();
+
+
+      this.submitedAnswers.forEach(obj => {
+        let questionId = obj.questionId
+        let answerId = obj.choiceId
+
+        let filtered_question = this.allQuestions.edges.find(obj=>{
+          return obj.node.id === questionId
+        })
+
+        let filtered_answer = filtered_question.node.choiceSet.edges.find(obj=>{
+          return obj.node.id === answerId
+        })
+
+        filtered_answer.node.votes++
+      });
+
+
+      this.submitedAnswers = []
     },
 
-    doVote: function(id) {
-      // console.log(id)
+    doVote: function (id) {
+      if(!this.isLoggedIn){
+        this.alert = true;
+        return
+      }
 
       this.$apollo
         .mutate({
@@ -110,29 +126,39 @@ export default {
           `,
           variables: {
             votes: {
-              id: id
-            }
-          }
+              id: id,
+            },
+          },
         })
-        .then(data => {
+        .then((data) => {
           // console.log(data.data.vote.message);
 
           if (data.data.vote.message === "You are not logged in") {
             this.alert = true;
+            return
           }
+
+        let filtered_question = this.allQuestions.edges.find(obj=>{
+          return obj.node.id === id
         })
-        .catch(error => {
+
+        if (filtered_question.node.userDidVote)
+            filtered_question.node.voteCount--
+        else 
+          filtered_question.node.voteCount++
+
+        filtered_question.node.userDidVote  = !filtered_question.node.userDidVote
+
+        })
+        .catch((error) => {
           // Error
           console.error(error);
           // We restore the initial user input
           //   this.newTag = newTag;
         });
-      this.$refs.queryComponentRef.getApolloQuery().refetch();
-    }
+    },
   },
-
-  mounted: function() {
-    this.$refs.queryComponentRef.getApolloQuery().refetch();
-  }
 };
 </script>
+
+
