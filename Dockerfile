@@ -8,4 +8,5 @@ RUN pip install -r requirements.txt
 COPY . /dragan/
 # another comment for testing
 EXPOSE $PORT
-CMD daphne -b 0.0.0.0 -p $PORT --access-log - --proxy-headers dragan.asgi:application
+CMD gunicorn -b 0.0.0.0:$PORT -w 4 -k uvicorn.workers.UvicornWorker dragan.asgi:application
+# CMD daphne -b 0.0.0.0 -p $PORT --access-log - --proxy-headers dragan.asgi:application
