@@ -27,8 +27,6 @@ class ChoiceLoader(DataLoader):
 
         for choice in Choice.objects.filter(question_id__in=question_keys).iterator():
             choices[choice.question_id].append(choice)
-        
-        print(choices)
 
 
         return Promise.resolve([choices.get(question_id, []) for question_id in question_keys])
@@ -152,12 +150,13 @@ class Query(ObjectType):
         return info.context.user.is_authenticated
 
     def resolve_all_questions(self, info):
-        questions = cache.get("questions")
-        if not questions:
-            questions = Question.objects.all()
-            cache.set("questions", questions)
+        # questions = cache.get("questions")
+        # if not questions:
+        #     questions = Question.objects.all()
+        #     cache.set("questions", questions)
         
-        return questions
+        # return questions
+        return Question.objects.all()
 
 
 class VoteMutation(relay.ClientIDMutation):
@@ -246,51 +245,3 @@ class Mutation(ObjectType):
     vote = VoteMutation.Field()
     create_question = CreateQuestionMutation.Field()
     submit_answers = SubmitAnswersMutation.Field()
-
-
-
-
-
-
-# class QuestionType(DjangoObjectType):
-#     class Meta:
-#         model = Question
-
-# class ChoiceType(DjangoObjectType):
-#     class Meta:
-#         model = Choice
-
-
-# class Query(graphene.ObjectType):
-#     all_questions = graphene.List(QuestionType)
-#     all_choices = graphene.List(ChoiceType)
-#     question = graphene.Field(QuestionType, id=graphene.Int())
-#     choice = graphene.Field(ChoiceType, id=graphene.Int())
-
-
-#     def resolve_question(self, info, *args, **kwargs):
-#         id = kwargs.get("id")
-
-#         if id is not None:
-#             return Question.objects.get(pk=id)
-
-#         return None
-
-#     def resolve_choice(self, info, *args, **kwargs):
-#         id = kwargs.get("id")
-#         name = kwargs.get("name")
-
-#         if id is not None:
-#             return Choice.objects.get(pk=id)
-
-#         return None
-
-
-
-#     def resolve_all_questions(self, info, *args, **kwargs):
-#         return Question.objects.all()
-
-#     def resolve_all_choices(self, info, *args, **kwargs):
-#         return Choice.objects.select_related('question').all()
-
-# schema = graphene.Schema(query=Query)

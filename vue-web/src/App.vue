@@ -102,14 +102,9 @@ export default {
       this.addQuestion = true
     },
 
-
-    forRef: function () {
-      this.$refs.qq.onDoAgain()
-    },
-
     doUpdateQuestion:function () {
+      // this.$apollo.queries.allQuestions.refetch()
       this.addQuestion = false
-      this.forRef()
     }
   }
 

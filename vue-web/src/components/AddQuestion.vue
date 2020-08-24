@@ -97,6 +97,7 @@ export default {
           if (data.data.createQuestion.message !== "You are not logged in"){
               this.answers = ["", ""]
               this.question = ""
+              this.valid = true
           }
         })
         .catch(error => {
