@@ -10,7 +10,8 @@
         <div v-if="finished">
             <v-card class="mx-auto" max-width="400">
                 <v-img :src="result"></v-img>
-                <v-card-title>Dragan</v-card-title>
+                <v-card-title>{{name}}</v-card-title>
+                <v-card-text>Izuzetno zanimljiva verzija Dragana!</v-card-text>
                 <v-card-actions>
                     <v-btn v-on:click="$emit('do-again')"> Odradi ponovo </v-btn>
                 </v-card-actions>
@@ -35,6 +36,7 @@ export default {
             finished : false,
             base : "static/kviz/",
             result : "",
+            name:"",
         }
     },
     props: {
@@ -51,6 +53,7 @@ export default {
         onDone: function (data) {
             this.finished = true
             this.result = "/" + this.base + data.data.submitAnswers.message + ".jpeg"
+            this.name = data.data.submitAnswers.message
         }
     },
     mounted: function (){

@@ -24,10 +24,8 @@ class ChoiceLoader(DataLoader):
 
         choices = defaultdict(list)
 
-
         for choice in Choice.objects.filter(question_id__in=question_keys).iterator():
             choices[choice.question_id].append(choice)
-
 
         return Promise.resolve([choices.get(question_id, []) for question_id in question_keys])
 
@@ -44,9 +42,6 @@ class VotesLoader(DataLoader):
         for key in question_keys:
             for user in Question.objects.get(pk=key).votes.all():
                 votes[key].append(user)
-        
-        print(votes)
-
 
         return Promise.resolve([votes.get(question_id, []) for question_id in question_keys])
 
@@ -104,7 +99,7 @@ class QuestionNode(ObjectType):
         if not info.context.user.is_authenticated:
             return User.objects.none()
 
-        return  vote_loader.load(self.id)
+        return  vote_loader.load(self.id).then(lambda votes: votes)
 
     def resolve_user_did_vote(self, info):
         if not info.context.user.is_authenticated:
@@ -132,8 +127,6 @@ class QuestionConnection(relay.Connection):
 
 
 
-
-
 class Query(ObjectType):
     question = relay.Node.Field(QuestionNode)
     all_questions = relay.ConnectionField(QuestionConnection)
@@ -150,14 +143,8 @@ class Query(ObjectType):
         return info.context.user.is_authenticated
 
     def resolve_all_questions(self, info):
-        # questions = cache.get("questions")
-        # if not questions:
-        #     questions = Question.objects.all()
-        #     cache.set("questions", questions)
-        
-        # return questions
-        return Question.objects.all()
-
+        questions = cache.get_or_set("questions", Question.objects.all(), 200)
+        return questions
 
 class VoteMutation(relay.ClientIDMutation):
 
@@ -175,7 +162,13 @@ class VoteMutation(relay.ClientIDMutation):
             message = "You are not logged in"
             return VoteMutation(question=None, message=message)
 
-        question = Question.objects.get(pk=from_global_id(id)[1])
+
+        questions = cache.get('questions')
+        print(questions)
+        if questions:
+            question = questions.get(pk=from_global_id(id)[1])
+        else:
+            question = Question.objects.get(pk=from_global_id(id)[1])
 
         votes = question.votes.all()
 
@@ -211,6 +204,7 @@ class CreateQuestionMutation(relay.ClientIDMutation):
             Choice.objects.create(question=question, choice_text=choice)
 
         question.save()
+        cache.set('questions', Question.objects.all())
         message = "OK"
         return VoteMutation(question=question, message=message)
 
