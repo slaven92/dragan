@@ -88,7 +88,7 @@ jobs:
       
       
       - name: Build and cache
-      - run: |
+        run: |
           echo ${{ secrets.GITACTION_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
           docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
           docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --push . --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit
