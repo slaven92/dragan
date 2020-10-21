@@ -88,10 +88,11 @@ jobs:
       
       
       - name: Build and cache
-      - run: echo ${{ secrets.GITACTION_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
-      - run: docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
-      - run: docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --push . --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit
-      - run: docker tag "slaven92/dragan:latest" docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
+      - run: |
+          echo ${{ secrets.GITACTION_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
+          docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
+          docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --push . --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit
+          docker tag "slaven92/dragan:latest" docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit && docker push docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
       
       
 #       # Runs a single command using the runners shell
