@@ -71,7 +71,8 @@ jobs:
       
       # Runs a single command using the runners shell
       - name: Build docker images
-        run: docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --push .
+#         run: docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --push .
+        run: docker buildx build -t "slaven92/dragan:latest" --platform linux/arm/v7 --push .
       
       
       
