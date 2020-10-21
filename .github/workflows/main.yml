@@ -33,7 +33,7 @@ jobs:
       - run: |
             cd vue-web
             npm install
-            vue build
+            npm run build
             cd ..
             python3 build.py
       
