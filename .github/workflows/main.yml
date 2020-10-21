@@ -28,11 +28,28 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
+      - name: Cache multiple paths
+        uses: actions/cache@v2
+        id: node-cache
+        with:
+          path: |
+            **/node_modules
+          key: ${{ runner.os }}-nodes-${{ hashFiles('./vue-web/package-lock.json') }}
+      
+      
+      
       - name: Setup Node.js environment
         uses: actions/setup-node@v2.1.2
+        if: steps.node-cache.outputs.cache-hit != 'true'
       - run: |
             cd vue-web
             npm install
+            cd ..
+       
+       
+      - name: Build Vue files and add them in Django
+        run: |
+            cd vue-web
             npm run build
             cd ..
             python3 build.py
@@ -71,8 +88,8 @@ jobs:
       
       # Runs a single command using the runners shell
       - name: Build docker images
-#         run: docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --push .
-        run: docker buildx build -t "slaven92/dragan:latest" --platform linux/arm/v7 --push .
+        run: docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --push .
+#         run: docker buildx build -t "slaven92/dragan:latest" --platform linux/arm/v7 --push .
       
       
       
