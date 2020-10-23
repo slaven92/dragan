@@ -91,9 +91,9 @@ jobs:
 #         run: |
 #           docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit --push .
         run: |
-          docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --cache-to=type=registry,ref=slaven92/dragan --cache-from=type=registry,ref=slaven92/dragan --push .
+          docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --cache-to="slaven92/dragan:cache" --cache-from="slaven92/dragan:cache" --push .
 #         run: |
-#           echo ${{ secrets.GITACTION_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
+#           echo ${{ secrets.GITHUB_TOKEN }} | docker login docker.pkg.github.com -u $GITHUB_ACTOR --password-stdin
 #           docker pull docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit || true
 #           docker buildx build -t "slaven92/dragan:latest" --platform linux/amd64,linux/arm/v7 --cache-from=docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit --push .
 #           docker tag "slaven92/dragan:latest" docker.pkg.github.com/$GITHUB_REPOSITORY/build-cache-no-buildkit
